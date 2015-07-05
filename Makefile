@@ -12,13 +12,6 @@ bspatch: blocksort.o bzip2.o bzip2recover.o bzlib.o compress.o crctable.o decomp
 	compress.o crctable.o decompress.o huffman.o \
 	randtable.o spewG.o bspatch.o -o bspatch
 
-#edit : main.o blocksort.o bzip2.o bzip2recover.o bzlib.o \
-#	compress.o crctable.o decompress.o huffman.o \
-#	randtable.o spewG.o smart_diff.o smart_patch.o
-#	cc -o edit main.o blocksort.o bzip2.o bzip2recover.o bzlib.o \
-#compress.o crctable.o decompress.o huffman.o \
-#randtable.o spewG.o smart_diff.o smart_patch.o
-
 blocksort.o: blocksort.c bzlib_private.h
 	cc $(CFLAGS) -c blocksort.c
 bzip2.o: bzip2.c bzlib.h
