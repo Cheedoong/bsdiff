@@ -1,17 +1,15 @@
 ALL : bsdiff bspatch
 
 CFLAGS += -DBSDIFF_EXECUTABLE -DBSPATCH_EXECUTABLE -O3 -fdata-sections -ffunction-sections
-CFLAGS_STRIP = -Wl,--gc-sections -Wl,--strip-all -fwhole-program -flto
+CFLAGS_STRIP = -Wl,--gc-sections -Wl,--strip-all #-fwhole-program -flto
 
-bsdiff: blocksort.o bzip2.o bzip2recover.o bzlib.o compress.o crctable.o decompress.o huffman.o randtable.o spewG.o bsdiff.o
-	cc $(CFLAGS) blocksort.o bzip2.o bzip2recover.o bzlib.o \
-	compress.o crctable.o decompress.o huffman.o \
-	randtable.o spewG.o bsdiff.o -o bsdiff $(CFLAGS_STRIP)
+bsdiff: blocksort.o huffman.o crctable.o randtable.o compress.o bzlib.o bsdiff.o
+	cc $(CFLAGS) blocksort.o huffman.o crctable.o randtable.o \
+	compress.o bzlib.o bsdiff.o -o bsdiff $(CFLAGS_STRIP)
 
-bspatch: blocksort.o bzip2.o bzip2recover.o bzlib.o compress.o crctable.o decompress.o huffman.o randtable.o spewG.o bspatch.o
-	cc $(CFLAGS) blocksort.o bzip2.o bzip2recover.o bzlib.o \
-	compress.o crctable.o decompress.o huffman.o \
-	randtable.o spewG.o bspatch.o -o bspatch $(CFLAGS_STRIP)
+bspatch: blocksort.o huffman.o crctable.o randtable.o decompress.o bzlib.o bspatch.o
+	cc $(CFLAGS) blocksort.o huffman.o crctable.o randtable.o \
+	decompress.o bzlib.o bspatch.o -o bspatch $(CFLAGS_STRIP)
 
 blocksort.o: blocksort.c bzlib_private.h
 	cc $(CFLAGS) -c blocksort.c
