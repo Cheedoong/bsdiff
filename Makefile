@@ -1,5 +1,6 @@
 ALL : bsdiff bspatch
 
+BIGFILES = -D_FILE_OFFSET_BITS=64
 CFLAGS += -DBSDIFF_EXECUTABLE -DBSPATCH_EXECUTABLE -O3 -fdata-sections -ffunction-sections
 CFLAGS_STRIP = -Wl,--gc-sections -Wl,--strip-all #-fwhole-program -flto
 
