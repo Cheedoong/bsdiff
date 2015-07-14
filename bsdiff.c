@@ -1,10 +1,11 @@
 /*-
  * Copyright 2003-2005 Colin Percival
  * Copyright 2012 Matthew Endsley
+ * Copyright 2015 Alan at Pear
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted providing that the following conditions 
+ * modification, are permitted providing that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
@@ -252,7 +253,7 @@ static int bsdiff_internal(const struct bsdiff_request req)
 				(req.old[scsc+lastoffset] == req.new[scsc]))
 				oldscore++;
 
-			if(((len==oldscore) && (len!=0)) || 
+			if(((len==oldscore) && (len!=0)) ||
 				(len>oldscore+8)) break;
 
 			if((scan+lastoffset<req.oldsize) &&
@@ -349,7 +350,7 @@ int bsdiff(const uint8_t* old, int64_t oldsize, const uint8_t* new, int64_t news
 	return result;
 }
 
-//#if defined(BSDIFF_EXECUTABLE)
+#if defined(BSDIFF_EXECUTABLE)
 
 #include <sys/types.h>
 
@@ -359,6 +360,30 @@ int bsdiff(const uint8_t* old, int64_t oldsize, const uint8_t* new, int64_t news
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+    /*
+    https://github.com/amireh/Karazeh/blob/master/src/bsdiff.cpp
+    or take a look at
+    https://github.com/HoverRace/HoverRace/blob/master/updater/bsdiff/bsdiff.cpp
+    or
+    https://chromium.googlesource.com/chromium/src/courgette/+/master/third_party/bsdiff_create.cc
+    I use MinGW GCC on Windows, so...
+    */
+#ifndef _WIN32
+#include <err.h>
+#define O_BINARY 0x8000
+#else
+    static void err(int i, ...)
+    {
+        cout << "dfghgh" << endl;
+        exit(i);
+    }
+    static void errx(int i, ...)
+    {
+        cout << "xxxdfghgh" << endl;
+        exit(i);
+    }
+#endif // _WIN32
 
 static int bz2_write(struct bsdiff_stream* stream, const void* buffer, int size)
 {
@@ -393,7 +418,7 @@ int main(int argc,char *argv[])
 
 	/* Allocate oldsize+1 bytes instead of oldsize bytes to ensure
 		that we never try to malloc(0) and get a NULL pointer */
-	if(((fd=open(argv[1],O_RDONLY,0))<0) ||
+	if(((fd=open(argv[1],O_RDONLY | O_BINARY,0))<0) ||
 		((oldsize=lseek(fd,0,SEEK_END))==-1) ||
 		((old=malloc(oldsize+1))==NULL) ||
 		(lseek(fd,0,SEEK_SET)!=0) ||
@@ -403,7 +428,7 @@ int main(int argc,char *argv[])
 
 	/* Allocate newsize+1 bytes instead of newsize bytes to ensure
 		that we never try to malloc(0) and get a NULL pointer */
-	if(((fd=open(argv[2],O_RDONLY,0))<0) ||
+	if(((fd=open(argv[2],O_RDONLY | O_BINARY,0))<0) ||
 		((newsize=lseek(fd,0,SEEK_END))==-1) ||
 		((new=malloc(newsize+1))==NULL) ||
 		(lseek(fd,0,SEEK_SET)!=0) ||
@@ -411,7 +436,7 @@ int main(int argc,char *argv[])
 		(close(fd)==-1)) err(1,"%s",argv[2]);
 
 	/* Create the patch file */
-	if ((pf = fopen(argv[3], "w")) == NULL)
+	if ((pf = fopen(argv[3], "wb")) == NULL)
 		err(1, "%s", argv[3]);
 
 	/* Write header (signature+newsize)*/
@@ -442,4 +467,4 @@ int main(int argc,char *argv[])
 	return 0;
 }
 
-//#endif
+#endif
